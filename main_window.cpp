@@ -7,9 +7,7 @@ MainWindow::MainWindow(Reddit* r) {
 	reddit = r;
 
 	layout = new QVBoxLayout();
-
-	welcomeLabel = new QLabel("Welcome to CS104 Reddit!!");
-	layout->addWidget(welcomeLabel);
+	layout->addWidget(new QLabel("Welcome to Qt Reddit!"));
 
 	// setup the new posts container widget
 	postsLayout = new QVBoxLayout();
@@ -19,70 +17,55 @@ MainWindow::MainWindow(Reddit* r) {
 	// add the container widget to the main layout
 	layout->addWidget(postsContainerWidget);
 
-	setupPosts(r->getPosts());
-
-	aboutButton = new QPushButton("About CS104 Reddit");
+	aboutButton = new QPushButton("About Qt Reddit");
 	layout->addWidget(aboutButton);
-
-	quitButton = new QPushButton("Quit");
-	layout->addWidget(quitButton);
-	// Create a new button with the text "Quit"
 	
+	refreshButton = new QPushButton("Refresh posts");
+	layout->addWidget(refreshButton);
+
 	setLayout(layout);
 	show();
 
 	connect(aboutButton, SIGNAL(clicked()), this, SLOT(showAbout()));
-
-	connect(quitButton, SIGNAL(clicked()), this, SLOT(quit()));
-	// Connect the quit button to the quit slot function
+	connect(refreshButton, SIGNAL(clicked()), this, SLOT(refreshButtonClicked()));
+	connect(r, SIGNAL(postsRefreshed()), this, SLOT(refreshPosts()));
 }
 
 MainWindow::~MainWindow() {
-	clearPosts();
-
-	delete postsLayout;
-	delete layout;
-	delete postsContainerWidget;
-
-	delete welcomeLabel;
-	delete aboutButton;
-
-	delete quitButton;
-	// Delete the quit button pointer
 }
 
 void MainWindow::setupPosts(std::vector<Post*> posts) {
 	clearPosts();
 
-	for(Post * p : posts){
-		PostWidget * pw = new PostWidget(p);
-		layout->addWidget(pw);
-		postWidgets.push_back(pw);
-	}
-	// Take in the vector of posts and for each of them:
-	// 1. create a PostWidget
-	// 2. add the PostWidget to the correct layout
-	// 3. add the PostWidget to the vector so that we can delete the pointers later
+	for(auto it = posts.begin(); it != posts.end(); it++) {
+		PostWidget* newPostWidget = new PostWidget(*it);
+		postsLayout->addWidget(newPostWidget);
+		postWidgets.push_back(newPostWidget);
+	}	
 }
 
 void MainWindow::clearPosts() {
-	for(PostWidget * pw : postWidgets){
-		layout->removeWidget(pw);
-		delete pw;
+	for (auto it = postWidgets.begin(); it != postWidgets.end(); it++) {
+		postsLayout->removeWidget(*it);
+		delete *it;
 	}
-
 	postWidgets.clear();
-	// For each PostWidget pointer in the vector
-	// 1. remove them from layout with removeWidget(QWidget*)
-	// 2. delete the pointer
-	// Then clear the vector
+}
+
+void MainWindow::refreshButtonClicked() {
+	reddit->refresh();
+}
+
+void MainWindow::refreshPosts() {
+	setupPosts(reddit->getPosts());
 }
 
 void MainWindow::showAbout() {
 	QMessageBox::information(this, "About", "Simple Qt app for lab7!");
 }
 
-void MainWindow::quit(){
+void MainWindow::quit() {
 	QApplication::exit();
 }
-// Create a quit function, that serves as a slot for the exit button.
+
+
