@@ -3,7 +3,6 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QLabel>
 #include <vector>
 #include "reddit.h"
 #include "post.h"
@@ -20,8 +19,8 @@ class MainWindow : public QWidget {
 	private slots:
 		void showAbout();
 		void quit();
-		// ADD YOUR CODE HERE
-		// declare a quit function under "slots"
+		void refreshPosts();
+		void refreshButtonClicked();
 		
 	private:
 		void setupPosts(std::vector<Post*>);
@@ -30,14 +29,10 @@ class MainWindow : public QWidget {
 		Reddit* reddit;
 
 		QVBoxLayout* layout;
-		QLabel* welcomeLabel;
 		QVBoxLayout* postsLayout;
 		QWidget* postsContainerWidget;
 		QPushButton* aboutButton;
-		QPushButton* quitButton;
-
-		// ADD YOUR CODE HERE
-		// add a quit button
+		QPushButton* refreshButton;
 
 		std::vector<PostWidget*> postWidgets;
 };
