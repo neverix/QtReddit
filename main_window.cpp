@@ -18,6 +18,7 @@ MainWindow::MainWindow(Reddit* r) {
 	layout->addWidget(postsContainerWidget);
 
 	aboutButton = new QPushButton("About Qt Reddit");
+
 	layout->addWidget(aboutButton);
 	
 	refreshButton = new QPushButton("Refresh posts");
